@@ -58,7 +58,6 @@ typings/
 .env
 
 # build folder
-/dist
 
 # npm5 lock file
 package-lock.json
