@@ -78,6 +78,6 @@ app.post('/memclear', (req, res) => {
   res.sendStatus(200);
 });
 
-app.listen(8080, () => {
+app.listen(process.env.PORT || 8080, () => {
   console.log('Server started.');
 });
