@@ -210,6 +210,9 @@ async function fetchDevelopers({ language = '', since = 'daily' } = {}) {
     });
 }
 
+const Towxml = require('towxml');
+
+const towxml = new Towxml();
 const app = express();
 app.use(cors());
 app.get('/languages', async (req, res) => {
@@ -279,6 +282,22 @@ app.get('/developers', async (req, res) => {
     cache.put(cacheKey, data, 1000 * 3600); // Store for a hour
 
     res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.toJSON());
+  }
+});
+app.get('/parse', async (req, res) => {
+  try {
+    const { type, content } = req.query;
+
+    if (type === 'markdown') {
+      const data = await towxml.toJson(content || '', 'markdown');
+      res.json(data);
+    } else {
+      const data = await towxml.toJson(content || '', 'html');
+      res.json(data);
+    }
   } catch (err) {
     console.error(err);
     res.status(500).send(err.toJSON());
