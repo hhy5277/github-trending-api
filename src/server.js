@@ -1,6 +1,7 @@
 import url from 'url';
 import express from 'express';
 import cache from 'memory-cache';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import { fetchAllLanguages, fetchRepositories, fetchDevelopers } from './fetch';
@@ -10,6 +11,8 @@ const towxml = new Towxml();
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/languages', async (req, res) => {
   const cached = cache.get('languages');
@@ -75,6 +78,22 @@ app.get('/developers', async (req, res) => {
 app.get('/parse', async (req, res) => {
   try {
     const { type, content } = req.query;
+    if (type === 'markdown') {
+      const data = await towxml.toJson(content || '', 'markdown');
+      res.json(data);
+    } else {
+      const data = await towxml.toJson(content || '', 'html');
+      res.json(data);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.toJSON());
+  }
+});
+
+app.post('/parse', async (req, res) => {
+  try {
+    const { type, content } = req.body;
     if (type === 'markdown') {
       const data = await towxml.toJson(content || '', 'markdown');
       res.json(data);
